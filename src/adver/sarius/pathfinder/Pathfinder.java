@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import net.driftingsouls.ds2.server.Location;
 import net.driftingsouls.ds2.server.entities.JumpNode;
@@ -29,24 +30,24 @@ public class Pathfinder {
 	/** Die bisher minimalste Distanz. Wird nur benutzt, wenn {@code onlyBest} true ist. **/
 	private int minDist;
 	
-	
-	public Pathfinder(){
+	public Pathfinder() {
 		clear();
 	}
-	public Pathfinder(int maxTestDist, boolean onlyBest){
+	public Pathfinder(int maxTestDist, boolean onlyBest) {
 		this();
 		this.maxTestDist = maxTestDist;
 		this.onlyBest = onlyBest;
 	}
-	
-	public void setOnlyBest(boolean onlyBest){
+
+	public void setOnlyBest(boolean onlyBest) {
 		this.onlyBest = onlyBest;
 	}
-	public void setMaxTestDist(int maxTestDist){
+
+	public void setMaxTestDist(int maxTestDist) {
 		this.maxTestDist = maxTestDist;
 	}
 
-	private void clear(){
+	private void clear() {
 		pathsList = new ArrayList<PathDistanceTupel>();
 		minDist = Integer.MAX_VALUE;
 	}
@@ -120,19 +121,19 @@ public class Pathfinder {
 	}
 	*/
 	
-	public String toString(Location start, Location end, PathDistanceTupel path){
+	public String toString(Location start, Location end, PathDistanceTupel path) {
 		StringBuilder builder = new StringBuilder();
 		Session db = HibernateUtils.createSession();
-		
+
 		builder.append("Distanz: ");
 		builder.append(path.getDistance());
 		builder.append(": ");
 		builder.append(this.toString(start));
 		// TODO: Gucken ob Queries zu rechenintensiv sind
-		for(Integer i : path.getPath()){
+		for (Integer i : path.getPath()) {
 			List<?> result = db.createQuery("FROM JumpNode WHERE id=:id")
-				.setInteger("id", i).list();
-			JumpNode jump = (JumpNode)result.get(0);
+					.setInteger("id", i).list();
+			JumpNode jump = (JumpNode) result.get(0);
 			builder.append(" --> ");
 			builder.append(this.toString(jump.getLocation()));
 			builder.append(" -JN-> ");
@@ -143,7 +144,7 @@ public class Pathfinder {
 		return builder.toString();
 	}
 	
-	private String toString(Location loc){
+	private String toString(Location loc) {
 		return loc.getSystem() + ":" + loc.getX() + "/" + loc.getY();
 	}
 	
@@ -154,9 +155,11 @@ public class Pathfinder {
 	 * @param end Endpunkt.
 	 * @param jnsToAvoid Set der JN-IDs die nicht genutzt werden sollen oder null.
 	 */
-	public void calculatePaths(Location start, Location end, Set<Integer> jnsToAvoid){
+	public void calculatePaths(Location start, Location end, Set<Integer> jnsToAvoid) {
 		clear();
-		if(jnsToAvoid == null) jnsToAvoid = new HashSet<Integer>();
+		if (jnsToAvoid == null) {
+			jnsToAvoid = new HashSet<Integer>();
+		}
 		fillPathList(start, end, jnsToAvoid, new ArrayList<Integer>(), 0);
 	}
 	
@@ -169,65 +172,64 @@ public class Pathfinder {
 	 * @param jnsUsed Liste der bereits genutzten JNs in entsprechender Reihenfolge.
 	 * @param distance Bisher zurueck gelegte Distanz.
 	 */
-	private void fillPathList(Location start, Location end, Set<Integer> jnsToAvoid, List<Integer> jnsUsed, int distance){
+	private void fillPathList(Location start, Location end, Set<Integer> jnsToAvoid, List<Integer> jnsUsed, int distance) {
 		// Wenn Start und Ziel im selben System liegen.
-		if(end.getSystem() == start.getSystem()){
+		if (end.getSystem() == start.getSystem()) {
 			distance += getDistance(start, end);
-			if(distance <= maxTestDist){
-				if(onlyBest){
-					if(distance < minDist){
+			if (distance <= maxTestDist) {
+				if (onlyBest) {
+					if (distance < minDist) {
 						minDist = distance;
 						pathsList.clear();
 						pathsList.add(new PathDistanceTupel(new ArrayList<Integer>(jnsUsed), distance));
 					}
-				} else{
+				} else {
 					pathsList.add(new PathDistanceTupel(new ArrayList<Integer>(jnsUsed), distance));
 				}
 			}
 			distance -= getDistance(start, end);
 		}
-		
+
 		int tmpDistance;
 		Set<Integer> tmpAvoid;
 		List<Integer> tmpUsed;
-		
+
 		// Jeden JN im Startsystem nutzen falls erlaubt.
 		List<JumpNode> sysJNs = Data.getJNs().get(start.getSystem());
-		for(JumpNode jn : sysJNs){
-			if(jnsToAvoid.contains(jn.getId())){
+		for (JumpNode jn : sysJNs) {
+			if (jnsToAvoid.contains(jn.getId())) {
 				continue;
 			}
 			tmpAvoid = new HashSet<Integer>(jnsToAvoid);
 			tmpAvoid.add(jn.getId());
-			tmpAvoid.add(Data.getOppositeJN(jn));
-			
+			Data.getOppositeJNs(jn).stream().map(JumpNode::getId).forEach(tmpAvoid::add);
+
 			tmpUsed = new ArrayList<Integer>(jnsUsed);
 			tmpUsed.add(jn.getId());
-			
+
 			tmpDistance = distance + getDistance(start, jn.getLocation());
-			if(tmpDistance > maxTestDist){
+			if (tmpDistance > maxTestDist) {
 				continue;
-			} else{
-				if(onlyBest && distance > minDist){
+			} else {
+				if (onlyBest && distance > minDist) {
 					continue;
 				}
-				fillPathList(new Location(jn.getSystemOut(), jn.getXOut(), jn.getYOut()), end, tmpAvoid, tmpUsed, tmpDistance);
-			}				
+				fillPathList(new Location(jn.getSystemOut(), jn.getXOut(), jn.getYOut()), end, tmpAvoid, tmpUsed,
+						tmpDistance);
+			}
 		}
-		
 	}
 	
 	/**
-	 * 
 	 * @return Die der Distanz entsprechend sortiere Liste alle gefundenen Pfade.
 	 */
-	public List<PathDistanceTupel> getPathResults(){
+	public List<PathDistanceTupel> getPathResults() {
 		Collections.sort(pathsList);
 		return this.pathsList;
 	}
 	
 	// TODO: Vllt noch auslagern
-	public int getDistance(Location l1, Location l2){
-		return Math.max(Math.abs(l1.getX()-l2.getX()), Math.abs(l1.getY() - l2.getY()));
+	public int getDistance(Location l1, Location l2) {
+		return Math.max(Math.abs(l1.getX() - l2.getX()), Math.abs(l1.getY() - l2.getY()));
 	}
 }
