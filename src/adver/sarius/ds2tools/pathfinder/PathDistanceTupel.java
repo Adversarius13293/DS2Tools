@@ -1,4 +1,4 @@
-package adver.sarius.pathfinder;
+package adver.sarius.ds2tools.pathfinder;
 
 import java.util.List;
 

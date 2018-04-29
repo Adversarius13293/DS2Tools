@@ -1,4 +1,4 @@
-package adver.sarius.pathfinder;
+package adver.sarius.ds2tools.pathfinder;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,8 +13,8 @@ import net.driftingsouls.ds2.server.entities.JumpNode;
 
 import org.hibernate.Session;
 
-import adver.sarius.Data;
-import adver.sarius.HibernateUtils;
+import adver.sarius.ds2tools.Data;
+import adver.sarius.ds2tools.HibernateUtils;
 
 public class Pathfinder {
 	

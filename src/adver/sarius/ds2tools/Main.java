@@ -1,12 +1,12 @@
-package adver.sarius;
+package adver.sarius.ds2tools;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import adver.sarius.ds2tools.pathfinder.PathDistanceTupel;
+import adver.sarius.ds2tools.pathfinder.Pathfinder;
 import net.driftingsouls.ds2.server.Location;
-import adver.sarius.pathfinder.PathDistanceTupel;
-import adver.sarius.pathfinder.Pathfinder;
 
 public class Main {
 	
