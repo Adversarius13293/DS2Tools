@@ -123,17 +123,14 @@ public class Pathfinder {
 	
 	public String toString(Location start, Location end, PathDistanceTupel path) {
 		StringBuilder builder = new StringBuilder();
-		Session db = HibernateUtils.createSession();
 
 		builder.append("Distanz: ");
 		builder.append(path.getDistance());
 		builder.append(": ");
 		builder.append(this.toString(start));
 		// TODO: Gucken ob Queries zu rechenintensiv sind
-		for (Integer i : path.getPath()) {
-			List<?> result = db.createQuery("FROM JumpNode WHERE id=:id")
-					.setInteger("id", i).list();
-			JumpNode jump = (JumpNode) result.get(0);
+		for (Integer id : path.getPath()) {
+			JumpNode jump = Data.getJN(id);
 			builder.append(" --> ");
 			builder.append(this.toString(jump.getLocation()));
 			builder.append(" -JN-> ");
@@ -150,6 +147,7 @@ public class Pathfinder {
 	
 	/**
 	 * Berechnet die Pfade vom Start zum Ende, ohne die JNs aus dem uebergebenen Set zu verwenden.
+	 * Letztes Ergebnis kann mit {@link #getPathResults()} abgerufen werden.
 	 * 
 	 * @param start Startpunkt.
 	 * @param end Endpunkt.

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,17 @@ public class Data {
 			}
 		}
 		return jns;
+	}
+	
+	/**
+	 * Gibt den JN mit der entsprechenden Id zurueck.
+	 * @param id Interne Id des JNs.
+	 * @return Zur Id gehoeriger JN.
+	 */
+	public static JumpNode getJN(int id) {
+		Optional<JumpNode> result = getJNs().values().stream().flatMap(list -> list.stream()
+				.filter(j -> j.getId() == id)).findAny();
+		return result.orElse(null); // TODO: some default
 	}
 
 	/**
