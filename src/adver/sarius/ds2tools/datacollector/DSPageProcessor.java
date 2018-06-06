@@ -7,6 +7,7 @@ public abstract class DSPageProcessor {
 	
 	public abstract void readPage(BufferedReader page, int id) throws IOException;
 	
+	// TODO: Auslagern nach util?
 	/**
 	 * Extracts the string between prefix and suffix.
 	 * If the prefix/suffix is null, it is evaluated as string from/to the start/end.

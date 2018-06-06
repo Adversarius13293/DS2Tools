@@ -1,6 +1,7 @@
 package adver.sarius.ds2tools.datacollector;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
@@ -28,12 +29,17 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 	// Waffen
 	// Modulslots
 	
-	public static void main(String[] args) throws IOException {
-		BufferedReader reader = new BufferedReader(new FileReader("/home/adversarius/Downloads/ship1.html"));
+	public static void main(String[] args) throws IOException {		
 
-		SchiffInfoProcessor sir = new SchiffInfoProcessor();
-
-		sir.readPage(reader, 1);
+		String directory = "/home/adversarius/Downloads/schiffinfo";
+		File[] files = new File(directory).listFiles((dir, name) -> name.matches("ship\\d+\\.html"));
+		
+		for(File file : files){
+			BufferedReader reader = new BufferedReader(new FileReader(file));
+			SchiffInfoProcessor sip = new SchiffInfoProcessor();
+			sip.readPage(reader, sip.toInt(sip.subString(file.getName(),"ship",".html")));
+		}
+		
 	}
 
 	/** Location of the pictures without the file iteself */
@@ -134,7 +140,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 	/**
 	 * Get internal module string by its name. 
 	 * Taken from sample data and manually extended. 
-	 * Returns "UNKNOWN_"+desc if not matched.
+	 * Returns "UNKNOWN_"+desc if not matched and writes unknown line.
 	 * 
 	 * @param desc description of the module slot
 	 * @return id string of the slot.
@@ -143,10 +149,52 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		switch (desc) {
 		case "Panzerung":
 			return "armour";
+		// guessed start
 		case "Schwere Panzerung":
-			return "armour_heavy"; // guessed
+			return "armour_heavy"; 
 		case "Hightech":
-			return "hightech"; // guessed
+			return "hightech"; 
+		case "Hightech Generation 2":
+			return "hightech2";
+		case "Hybridpanzerung":
+			return "armour_hybrid";
+		case "Schwere Hybridpanzerung":
+			return "armour_hybrid_heavy";
+		case "Bewaffnung [Installation]":
+			return "weapon_installation";
+		case "Spezialisierung Depot":
+			return "depot_upgrade";
+		case "Bewaffnung [Station]":
+			return "weapon_depot";
+		case "Rüstslot schwerer Kreuzer":
+			return "heavy_cruiser_upgrade";
+		case "Bewaffnung [große Schiffe]":
+			return "weapon_large";
+		case "Rüstslot Flottentender":
+			return "flottender_upgrade";
+		case "Rüstslot Großfrachter":
+			return "transport_upgrade";
+		case "Spezialisierung Boadicea":
+			return "boadicea_upgrade"; 
+		case "Spezialisierung Nareos-Installation":
+			return "nareos_upgrade";
+		case "Paladin Defensivwaffen":
+			return "paladin_terran_destroyer_deffensive";
+		case "Paladin Antrieb":
+			return "paladin_terran_destroyer_engine";
+		case "Paladin Hülle":
+			return "paladin_terran_destroyer_hull";
+		case "Paladin Offensivwaffen":
+			return "paladin_terran_destroyer_offensive";
+		case "Paladin Reaktor":
+			return "paladin_terran_destroyer_reactor";
+		case "Paladin Spezial":
+			return "paladin_terran_destroyer_special";
+		case "Paladin Technik":
+			return "paladin_terran_destroyer_tech";
+		case "Einheitenquartiere [PTr]":
+			return "troop_upgrade";
+		// guessed end
 		case "Rüstslot Kaperschiff":
 			return "boarding_cruiser_upgrade";
 		case "Zerstörer Deffensivwaffen":
@@ -205,9 +253,9 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			return "misctanker";
 		case "Rüstslot Ganymed-Station":
 			return "misc_ganystation";
-		case "Diverses [Kottos]":
+		case "Rüstset [Träger]": // renamed Diverses [Kottos] to Rüstset [Träger]
 			return "misc_kottos";
-		case "Diverses [grosse Schiffe]":
+		case "Diverses [große Schiffe]": // changed ss to ß
 			return "misc_large";
 		// TODO: can't be distinguished?
 		// case "Bewaffnung": return "misc_large_weapon";
@@ -310,6 +358,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		case "Bewaffnung Station":
 			return "weapon_station";
 		default:
+			unknownLine("getModule " + desc);
 			return "UNKNOWN_" + desc;
 		}
 	}
@@ -349,8 +398,9 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				section = "";
 			} else if (line.equals("<h3>Vorrausetzungen</h3>")) {
 				section = "vorraus";
-			} else if (section.equals("vorraus") && line.contains(
-					"href=\"https://ds2.drifting-souls.net/ds?module=forschinfo&amp;action=default&amp;res=")) {
+			} else if (section.equals("vorraus") && (
+					line.startsWith("<a class=\"ok\" href=\"https://ds2.drifting-souls.net/ds?module=forschinfo&amp;action=default&amp;res=")
+					|| line.startsWith("<a class=\"error\" href=\"https://ds2.drifting-souls.net/ds?module=forschinfo&amp;action=default&amp;res="))) {
 				Forschung res = getForschung(toInt(subString(line,
 						"href=\"https://ds2.drifting-souls.net/ds?module=forschinfo&amp;action=default&amp;res=",
 						"\">")));
@@ -452,7 +502,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				Map<String, Integer> weapons = shipType.getWeapons();
 				weapons.put(weaponName, toInt(subString(line, "<td class=\"noBorderX\">", "</td>")));
 				shipType.setWeapons(weapons);
-			} else if (section.equals("waffen") && line.equals("</tbody></table>")) {
+			} else if (section.equals("waffen") && (line.equals("</tbody></table>") || line.equals("<tbody><tr><td class=\"noBorderX\">-keine-</td></tr>"))) {
 				section = "";
 			} else if (line.equals("<h3>Antrieb</h3>")) {
 				section = "antrieb";
@@ -472,6 +522,8 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				section = "";
 			} else if (line.endsWith("Jägerdocks<br>")) {
 				shipType.setJDocks(toInt(subString(line, null, "Jägerdocks<br>")));
+			} else if(line.startsWith("Externe Dockinganlage (Kapazität:")){
+				shipType.setADocks(toInt(subString(line, "Externe Dockinganlage (Kapazität:", ")<br>")));
 			} else if (line.equals("<h1>Modulsteckplätze</h1>")) {
 				section = "module";
 			} else if (section.equals("module") && line.contains("<br>")) {
@@ -486,22 +538,38 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				}
 				shipType.setModules(modules.substring(0, modules.length() - 1));
 				section = "";
+			} else if(line.endsWith("Werftslots<br>")) {
+				shipType.setWerft(toInt(subString(line, null, "Werftslots<br>")));
 			} else if (line.startsWith("<br>Hüllenstärke: ")) {
 				shipType.setHull(toInt(subString(line, "Hüllenstärke: ", "<br>")));
 			} else if (line.startsWith("Ablative Panzerung: ")) {
 				shipType.setAblativeArmor(toInt(subString(line, "Ablative Panzerung: ", "<br>")));
 			} else if (line.startsWith("Panzerung:")) {
 				shipType.setPanzerung(toInt(subString(line, "Panzerung:", "<br>")));
+			} else if(line.startsWith("Schildstärke:")){
+				shipType.setShields(toInt(subString(line, "Schildstärke:", "<br>")));
 			} else if (line.startsWith("Platz für Einheiten:")) {
 				shipType.setUnitSpace(toInt(subString(line, "Platz für Einheiten:", "<br>")));
 			} else if (line.startsWith("Maximale Einheitengröße:")) {
 				shipType.setMaxUnitSize(toInt(subString(line, "Maximale Einheitengröße:", "<br>")));
 			} else if (line.startsWith("Nahrungsspeicher:")) {
 				shipType.setNahrungCargo(toInt(subString(line, "Nahrungsspeicher:", "<br>")));
+			} else if(line.startsWith("Tanker: <img")) {
+				shipType.setDeutFactor(toInt(subString(line, "Deuterium\">", " für <img")));
+			} else if(line.startsWith("Produziert: <img") && line.contains("alt=\"Nahrung\">")){
+				shipType.setHydro(toInt(subString(line, "alt=\"Nahrung\">", "<br>")));
+			} else if(line.startsWith("Torpedoabwehr:")){
+				shipType.setTorpedoDef(toInt(subString(line, "Torpedoabwehr:", "%<br>")));
 			} else if (line.startsWith("Betriebskosten: ")) {
 				shipType.setReCost(toInt(subString(line, "Betriebskosten: ", "RE")));
 			} else if (getShipFlag(line) != null) {
+				section = "flag";
 				shipFlags.append(getShipFlag(line).getFlag()).append(" ");
+			} else if(section.equals("flag") && !line.equals("</span>")){
+				// continue
+				// TODO: reliable to ignore !only! flag description?
+			} else if(section.equals("flag") && line.equals("</span>")){
+				section = "";
 			} else if (line.equals("<h3>Beschreibung</h3>")) {
 				section = "besch";
 			} else if (section.equals("besch") && line.equals("</td>")) {
@@ -512,7 +580,9 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				unknownLine(line);
 			}
 		}
-		shipType.setFlags(shipFlags.substring(0, shipFlags.length() - 1));
+		if(shipFlags.length() > 1){
+			shipType.setFlags(shipFlags.substring(0, shipFlags.length() - 1));
+		}
 		shipType.setVersorger(shipType.hasFlag(ShipTypeFlag.VERSORGER));
 
 		guessValues(shipType);
@@ -540,7 +610,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		shipType.setMinCrew((int) (shipType.getCrew() * 0.6));
 		// guess thats how its used
 		shipType.setSrs(shipType.getSensorRange() > 0);
-
+		// TODO: Einwegwerft?
 		return shipType;
 	}
 	
@@ -575,7 +645,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				|| line.endsWith("Modulsteckplätze")
 				|| line.contains("info.gif")
 				|| line.startsWith("<td class=\"noBorderX\"><a class=\"tooltip forschinfo\"")
-				|| getShipFlag(line) != null
+//				|| getShipFlag(line) != null // TODO: line breaks
 				|| line.contains("parent.")) {
 			return;
 		} else {
