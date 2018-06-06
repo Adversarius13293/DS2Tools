@@ -1,4 +1,4 @@
-package adver.sarius.ds2tools.datacollector;
+package adver.sarius.ds2tools.extended;
 
 import net.driftingsouls.ds2.server.entities.Forschung;
 

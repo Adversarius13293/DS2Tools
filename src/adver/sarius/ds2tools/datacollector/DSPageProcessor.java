@@ -3,8 +3,8 @@ package adver.sarius.ds2tools.datacollector;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-public abstract class DSPageReader {
-
+public abstract class DSPageProcessor {
+	
 	public abstract void readPage(BufferedReader page, int id) throws IOException;
 	
 	/**

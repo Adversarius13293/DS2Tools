@@ -7,6 +7,8 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
+import adver.sarius.ds2tools.extended.ForschungExt;
+import adver.sarius.ds2tools.extended.ShipTypeExt;
 import net.driftingsouls.ds2.server.cargo.Cargo;
 import net.driftingsouls.ds2.server.cargo.ItemID;
 import net.driftingsouls.ds2.server.entities.Forschung;
@@ -17,7 +19,7 @@ import net.driftingsouls.ds2.server.ships.ShipClasses;
 import net.driftingsouls.ds2.server.ships.ShipType;
 import net.driftingsouls.ds2.server.ships.ShipTypeFlag;
 
-public class SchiffInfoReader extends DSPageReader {
+public class SchiffInfoProcessor extends DSPageProcessor {
 
 	// Datenblatt https://ds2.drifting-souls.net/ds?module=schiffinfo&sess=&ship=1
 	
@@ -29,7 +31,7 @@ public class SchiffInfoReader extends DSPageReader {
 	public static void main(String[] args) throws IOException {
 		BufferedReader reader = new BufferedReader(new FileReader("/home/adversarius/Downloads/ship1.html"));
 
-		SchiffInfoReader sir = new SchiffInfoReader();
+		SchiffInfoProcessor sir = new SchiffInfoProcessor();
 
 		sir.readPage(reader, 1);
 	}
