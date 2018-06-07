@@ -54,12 +54,12 @@ public class Main {
 		try{
 			// TODO: use 1.html instead of ship1.html
 			File[] files = new File(config.datacollector.getSchiffinfoDirectory())
-					.listFiles((dir, name) -> name.matches("ship\\d+\\.html"));
+					.listFiles((dir, name) -> name.matches("\\d+\\.html"));
 			
 			for(File file : files){
 				BufferedReader reader = new BufferedReader(new FileReader(file));
 				SchiffInfoProcessor sip = new SchiffInfoProcessor();
-				sip.readPage(reader, sip.toInt(sip.subString(file.getName(),"ship",".html")));
+				sip.readPage(reader, sip.toInt(sip.subString(file.getName(), null,".html")));
 			}
 		} catch(IOException ex){
 			System.out.println("Failed to read SchiffInfo files: " + ex);
