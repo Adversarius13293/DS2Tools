@@ -1,1 +1,3 @@
 /src/net/driftingsouls/ds2/server
+/resources/config.properties
+/resources/log4j.properties
