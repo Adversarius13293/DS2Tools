@@ -1,32 +1,82 @@
 package adver.sarius.ds2tools;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 
+import adver.sarius.ds2tools.datacollector.SchiffInfoProcessor;
 import adver.sarius.ds2tools.pathfinder.PathDistanceTupel;
 import adver.sarius.ds2tools.pathfinder.Pathfinder;
 import net.driftingsouls.ds2.server.Location;
 
 public class Main {
 	
+	private static DS2ToolsConfig config;
+	
 	public static void main(String[] args) {
-		doPathFinder();
-//		doBiggestShortestDistance();
+		try {
+			Properties props = new Properties();
+			if (args.length == 1) {
+				System.out.println("Loading file " + args[0]);
+				props.load(new FileInputStream(args[0]));
+			} else {
+				System.out.println("Loading default config file config.properties");
+				props.load(Main.class.getClassLoader().getResourceAsStream("config.properties"));
+				new DS2ToolsConfig(props);
+			}
+			config = new DS2ToolsConfig(props);
+		} catch (IOException ex) {
+			System.out.println("Failed to read properties: " + ex);
+			System.exit(0);
+		}
+		
+		if(config.pathfinder.isPathEnabled()){
+			doPathFinder();
+		}
+		if(config.pathfinder.isDistanceEnabled()){
+			doBiggestShortestDistance();
+		}
+		if(config.datacollector.isSchiffInfoEnabled()){
+			doSchiffInfoProcessor();
+		}
+		System.out.println("Finished");
 	}
 	
+	
+	public static void doSchiffInfoProcessor(){
+		try{
+			// TODO: use 1.html instead of ship1.html
+			File[] files = new File(config.datacollector.getSchiffinfoDirectory())
+					.listFiles((dir, name) -> name.matches("ship\\d+\\.html"));
+			
+			for(File file : files){
+				BufferedReader reader = new BufferedReader(new FileReader(file));
+				SchiffInfoProcessor sip = new SchiffInfoProcessor();
+				sip.readPage(reader, sip.toInt(sip.subString(file.getName(),"ship",".html")));
+			}
+		} catch(IOException ex){
+			System.out.println("Failed to read SchiffInfo files: " + ex);
+		}
+	}
+		
 	/**
 	 * Den kürzesten Weg von a nach b finden.
 	 */
 	public static void doPathFinder(){
-		int maxDistance = 1000;
-		boolean onlyBest = false;
-		Location start = new Location(605,200, 120);
-		Location end = new Location(605, 200, 120);
+		int maxDistance = config.pathfinder.getMaxDistance();
+		boolean onlyBest = config.pathfinder.isOnlyBest();
+		Location start = new Location(config.pathfinder.getStartSystem(), config.pathfinder.getStartX(), config.pathfinder.getStartY());
+		Location end = new Location(config.pathfinder.getEndSystem(), config.pathfinder.getEndX(), config.pathfinder.getEndY());
 		Set<Integer> jnsToAvoid = new HashSet<Integer>();
 		List<PathDistanceTupel> result;
-		int maxResults = 5;
+		int maxResults = config.pathfinder.getMaxResults();
 
 		Pathfinder pf = new Pathfinder(maxDistance, onlyBest);
 		pf.calculatePaths(start, end, jnsToAvoid);
@@ -40,9 +90,6 @@ public class Main {
 	/**
 	 * Die am weitesten voneinander entfernten Punkte innerhalb eines Systems finden.
 	 * Fuer Eta Nebular ausgelegt. Einiges an Optimierungsbedarf.
-	 * 
-	 * Wie groß der Abstand der am weitesten voneinander entfernten Punkte ist
-	 * 
 	 */
 	// TODO: arschlangsam
 	public static void doBiggestShortestDistance(){
@@ -53,7 +100,7 @@ public class Main {
 		
 		int counter = 0;
 		PathDistanceTupel max = new PathDistanceTupel(Collections.emptyList(), 205);
-		for(int x = 1; x <= width; x++) {
+		for(int x = config.pathfinder.getDistanceX(); x <= width; x++) {
 			System.out.println("starting with x="+x);
 			for(int y = 1; y <= height; y++) {
 				System.out.println("starting with y="+y);

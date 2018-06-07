@@ -71,6 +71,7 @@ public class DataCollector {
 	
 	// TODO: Does not work, can't login properly
 	public static void main(String[] args) throws Exception{
+		System.exit(0);;
 		try {
 //			URL url = new URL("http://localhost:8080/driftingsouls/ds?module=client#/map/2/1/1?admin=false");
 			String urlString = "http://localhost:8080/driftingsouls/ds";

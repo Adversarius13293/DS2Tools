@@ -1,8 +1,6 @@
 package adver.sarius.ds2tools.datacollector;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.Map;
@@ -25,24 +23,12 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 	// Datenblatt https://ds2.drifting-souls.net/ds?module=schiffinfo&sess=&ship=1
 	
 	// ShipType
-	// Baukosten
-	// Waffen
+	// Baukosten 
+	// Waffen 
 	// Modulslots
 	
-	public static void main(String[] args) throws IOException {		
 
-		String directory = "/home/adversarius/Downloads/schiffinfo";
-		File[] files = new File(directory).listFiles((dir, name) -> name.matches("ship\\d+\\.html"));
-		
-		for(File file : files){
-			BufferedReader reader = new BufferedReader(new FileReader(file));
-			SchiffInfoProcessor sip = new SchiffInfoProcessor();
-			sip.readPage(reader, sip.toInt(sip.subString(file.getName(),"ship",".html")));
-		}
-		
-	}
-
-	/** Location of the pictures without the file iteself */
+	/** Location of the pictures without the filename */
 	private static final String PICTURE_PATH = "data/dynamicContent/";
 		
 	/**
@@ -382,7 +368,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				shipType.setShipClass(getShipClass(subString(line, ">", "</span><br>")));
 			} else if ("".equals(shipType.getPicture()) && line.startsWith("<img src=\"")
 					&& line.endsWith(" alt=\"\">")) {
-				// TODO: is it always _flies ?
+				// TODO: is it always _files ?
 				shipType.setPicture(PICTURE_PATH + subString(line, "_files/", "\" alt=\""));
 			} else if (line.equals("<h3>Reaktorwerte</h3>")) {
 				section = "reaktor";
