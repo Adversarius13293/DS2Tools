@@ -360,9 +360,12 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		String line;
 		while ((line = page.readLine()) != null) {
 			line = line.trim();
+			// TODO: missing: showorderable, showbuildable, Flagschiff
 			if ("".equals(shipType.getNickname())
 					&& line.startsWith("<span style=\"color:#FFFFFF;font-weight:bold;\">")) {
 				shipType.setNickname(subString(line, ">", "</span><br>"));
+			} else if(line.equals("<span class=\"verysmallfont\" style=\"color:red;font-style:italic;font-weight:normal\">unsichtbar</span>")) {
+				shipType.setHide(true);
 			} else if (ShipClasses.UNBEKANNT == shipType.getShipClass()
 					&& line.startsWith("<span class=\"verysmallfont\" style=\"font-style:italic\">")) {
 				shipType.setShipClass(getShipClass(subString(line, ">", "</span><br>")));
