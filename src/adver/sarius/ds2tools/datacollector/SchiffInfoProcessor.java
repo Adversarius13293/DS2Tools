@@ -164,6 +164,8 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			return "boadicea_upgrade"; 
 		case "Spezialisierung Nareos-Installation":
 			return "nareos_upgrade";
+		case "Rüstslot Fregatte":
+			return "fregatte_upgrade";
 		case "Paladin Defensivwaffen":
 			return "paladin_terran_destroyer_deffensive";
 		case "Paladin Antrieb":
@@ -178,6 +180,20 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			return "paladin_terran_destroyer_special";
 		case "Paladin Technik":
 			return "paladin_terran_destroyer_tech";
+		case "Pharos Deffensivwaffen":
+			return "pharos_vasudan_destroyer_deffensive";
+		case "Pharos Antrieb":
+			return "pharos_vasudan_destroyer_engine";
+		case "Pharos Hülle":
+			return "pharos_vasudan_destroyer_hull";
+		case "Pharos Offensivwaffen":
+			return "pharos_vasudan_destroyer_offensive";
+		case "Pharos Reaktor":
+			return "pharos_vasudan_destroyer_reactor";
+		case "Pharos Spezial":
+			return "pharos_vasudan_destroyer_special";
+		case "Pharos Technik":
+			return "pharos_vasudan_destroyer_tech";
 		case "Einheitenquartiere [PTr]":
 			return "troop_upgrade";
 		// guessed end
@@ -349,6 +365,16 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		}
 	}
 	
+	private ShipType lastShipType; 
+	public ShipType getShipType(){
+		return this.lastShipType;
+	}
+	
+	private ShipBaubar lastShipBaubar;
+	public ShipBaubar getShipBaubar(){
+		return lastShipBaubar;
+	}
+
 	@Override
 	public void readPage(BufferedReader page, int shipId) throws IOException {
 		ShipType shipType = new ShipTypeExt(shipId);
@@ -564,7 +590,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			} else if (section.equals("besch") && line.equals("</td>")) {
 				section = "";
 			} else if (section.equals("besch")) {
-				shipType.setDescrip(shipType.getDescrip() + " " + line);
+				shipType.setDescrip(shipType.getDescrip() + line + " ");
 			} else {
 				unknownLine(line);
 			}
@@ -573,11 +599,13 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			shipType.setFlags(shipFlags.substring(0, shipFlags.length() - 1));
 		}
 		shipType.setVersorger(shipType.hasFlag(ShipTypeFlag.VERSORGER));
+		shipType.setDescrip(shipType.getDescrip().trim());
+		shipType.setDescrip(convertHtmlToBBCode(shipType.getDescrip()));
 
 		guessValues(shipType);
 
-		System.out.println(toString(shipType));
-		System.out.println(toString(shipBaubar));
+		this.lastShipType = shipType;
+		this.lastShipBaubar = shipBaubar;
 	}	
 	
 	/**
