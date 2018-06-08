@@ -2,6 +2,7 @@ package adver.sarius.ds2tools.datacollector;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Stack;
 
 public abstract class DSPageProcessor {
 	
@@ -18,21 +19,20 @@ public abstract class DSPageProcessor {
 	 * @param suffix the word ends with the suffix.
 	 * @return returns the string between prefix and suffix.
 	 */
-	public String subString(String line, String prefix, String suffix){
-		if(line == null){
+	public String subString(String line, String prefix, String suffix) {
+		if (line == null) {
 			return null;
 		}
 		int start = 0;
-		if(prefix != null){
-			start = line.indexOf(prefix)+prefix.length();
+		if (prefix != null) {
+			start = line.indexOf(prefix) + prefix.length();
 		}
 		line = line.substring(start);
-		
+
 		int end = line.length();
-		if(suffix != null){
+		if (suffix != null) {
 			end = line.indexOf(suffix);
 		}
-		
 		return line.substring(0, end);
 	}
 	
@@ -43,7 +43,50 @@ public abstract class DSPageProcessor {
 	 * @param number string representation of the number.
 	 * @return number as an int.
 	 */
-	public int toInt(String number){
+	public int toInt(String number) {
 		return Integer.parseInt(number.trim().replaceAll("\\.", ""));
+	}
+	
+	/**
+	 * Converts some html tags into DS2 format to be stored in the DB.
+	 * 
+	 * @param html the text with html tags.
+	 * @return same text with replaced tags.
+	 */
+	public String convertHtmlToBBCode(String html) {
+		html = html.replaceAll("<br>", "\\\\r\\\\n");
+		Stack<String> closingTags = new Stack<>();
+		int counter = 0;
+		while (true && counter++ < 100) {
+			int opening = html.indexOf("<span style=");
+			int closing = html.indexOf("</span>");
+
+			if (opening < closing && opening >= 0) {
+				String tagContent = subString(html, "<span style=\"", "\">");
+				if (tagContent.startsWith("color:")) {
+					String color = tagContent.substring(6);
+					html = html.replaceFirst("<span style=\"color:" + color + "\">", "[color=" + color + "]");
+					closingTags.push("[/color]");
+				} else if (tagContent.equals("font-weight:bold")) {
+					html = html.replaceFirst("<span style=\"font-weight:bold\">", "[b]");
+					closingTags.push("[/b]");
+				} else if (tagContent.equals("text-decoration:underline")) {
+					html = html.replaceFirst("<span style=\"text-decoration:underline\">", "[u]");
+					closingTags.push("[/u]");
+				} else if (tagContent.equals("font-style:italic")) {
+					html = html.replaceFirst("<span style=\"font-style:italic\">", "[i]");
+					closingTags.push("[/i]");
+				} else {
+					// TODO: remove unknown tag to continue?
+					System.out.println("convertHtmlToBBCode: Unknown tagContent: " + tagContent);
+					break;
+				}
+			} else if (opening > closing || (opening < 0 && closing >= 0)) {
+				html = html.replaceFirst("</span>", closingTags.pop());
+			} else {
+				break;
+			}
+		}
+		return html;
 	}
 }
