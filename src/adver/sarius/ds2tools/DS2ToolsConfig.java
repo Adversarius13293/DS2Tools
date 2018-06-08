@@ -93,5 +93,9 @@ public class DS2ToolsConfig {
 		public String getSchiffinfoDirectory() {
 			return properties.getProperty("datacollector.schiffinfo.directory");
 		}
+		
+		public String getWriteDirectory() {
+			return properties.getProperty("datacollector.write.directory");
+		}
 	}
 }
