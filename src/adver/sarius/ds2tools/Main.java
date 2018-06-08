@@ -5,16 +5,19 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
+import adver.sarius.ds2tools.datacollector.SQLWriter;
 import adver.sarius.ds2tools.datacollector.SchiffInfoProcessor;
 import adver.sarius.ds2tools.pathfinder.PathDistanceTupel;
 import adver.sarius.ds2tools.pathfinder.Pathfinder;
 import net.driftingsouls.ds2.server.Location;
+import net.driftingsouls.ds2.server.ships.ShipType;
 
 public class Main {
 	
@@ -51,19 +54,24 @@ public class Main {
 	
 	
 	public static void doSchiffInfoProcessor(){
+		List<ShipType> ships = new ArrayList<>();
 		try{
-			// TODO: use 1.html instead of ship1.html
 			File[] files = new File(config.datacollector.getSchiffinfoDirectory())
 					.listFiles((dir, name) -> name.matches("\\d+\\.html"));
-			
+			// TODO: Einwegwerft Impulsor
 			for(File file : files){
 				BufferedReader reader = new BufferedReader(new FileReader(file));
 				SchiffInfoProcessor sip = new SchiffInfoProcessor();
 				sip.readPage(reader, sip.toInt(sip.subString(file.getName(), null,".html")));
+				ships.add(sip.getShipType());
+				reader.close();
 			}
 		} catch(IOException ex){
 			System.out.println("Failed to read SchiffInfo files: " + ex);
 		}
+		ships.sort((s1, s2) -> s1.getId() - s2.getId());
+		SQLWriter writer = new SQLWriter(config.datacollector.getWriteDirectory());
+		writer.writeShipTypes(ships);
 	}
 		
 	/**
