@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import adver.sarius.ds2tools.extended.ForschungExt;
+import adver.sarius.ds2tools.extended.ShipBaubarExt;
 import adver.sarius.ds2tools.extended.ShipTypeExt;
 import net.driftingsouls.ds2.server.cargo.Cargo;
 import net.driftingsouls.ds2.server.cargo.ItemID;
@@ -378,7 +379,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 	@Override
 	public void readPage(BufferedReader page, int shipId) throws IOException {
 		ShipType shipType = new ShipTypeExt(shipId);
-		ShipBaubar shipBaubar = new ShipBaubar(shipType);
+		ShipBaubar shipBaubar = new ShipBaubarExt(shipType);
 
 		String weaponName = "";
 		StringBuilder shipFlags = new StringBuilder();
@@ -603,7 +604,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		shipType.setDescrip(convertHtmlToBBCode(shipType.getDescrip()));
 
 		guessValues(shipType);
-
+		
 		this.lastShipType = shipType;
 		this.lastShipBaubar = shipBaubar;
 	}	

@@ -17,6 +17,7 @@ import adver.sarius.ds2tools.datacollector.SchiffInfoProcessor;
 import adver.sarius.ds2tools.pathfinder.PathDistanceTupel;
 import adver.sarius.ds2tools.pathfinder.Pathfinder;
 import net.driftingsouls.ds2.server.Location;
+import net.driftingsouls.ds2.server.ships.ShipBaubar;
 import net.driftingsouls.ds2.server.ships.ShipType;
 
 public class Main {
@@ -55,6 +56,7 @@ public class Main {
 	
 	public static void doSchiffInfoProcessor(){
 		List<ShipType> ships = new ArrayList<>();
+		List<ShipBaubar> bau = new ArrayList<>();
 		try{
 			File[] files = new File(config.datacollector.getSchiffinfoDirectory())
 					.listFiles((dir, name) -> name.matches("\\d+\\.html"));
@@ -63,15 +65,24 @@ public class Main {
 				BufferedReader reader = new BufferedReader(new FileReader(file));
 				SchiffInfoProcessor sip = new SchiffInfoProcessor();
 				sip.readPage(reader, sip.toInt(sip.subString(file.getName(), null,".html")));
+				bau.add(sip.getShipBaubar());
 				ships.add(sip.getShipType());
 				reader.close();
 			}
 		} catch(IOException ex){
 			System.out.println("Failed to read SchiffInfo files: " + ex);
 		}
-		ships.sort((s1, s2) -> s1.getId() - s2.getId());
+		
 		SQLWriter writer = new SQLWriter(config.datacollector.getWriteDirectory());
-		writer.writeShipTypes(ships);
+		
+		ships.sort((s1, s2) -> s1.getId() - s2.getId());
+		writer.writeList(ships);
+		
+		// Could take ShipBaubar from module=werft with correct IDs and npc ships.
+		// But that would be without res or race info
+		bau.removeIf(b -> b.getDauer() <= 0);
+		bau.sort((b1, b2) -> b1.getType().getId() - b2.getType().getId());
+		writer.writeList(bau);
 	}
 		
 	/**
