@@ -123,249 +123,29 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			return null;
 		}
 	}
-	
+
 	/**
-	 * Get internal module string by its name. 
-	 * Taken from sample data and manually extended. 
-	 * Returns "UNKNOWN_"+desc if not matched and writes unknown line.
+	 * Get internal module string by its name.
+	 * Uses the normalized description as id.
 	 * 
 	 * @param desc description of the module slot
 	 * @return id string of the slot.
 	 */
-	private String getModule(String desc) {
-		switch (desc) {
-		case "Panzerung":
-			return "armour";
-		// guessed start
-		case "Schwere Panzerung":
-			return "armour_heavy"; 
-		case "Hightech":
-			return "hightech"; 
-		case "Hightech Generation 2":
-			return "hightech2";
-		case "Hybridpanzerung":
-			return "armour_hybrid";
-		case "Schwere Hybridpanzerung":
-			return "armour_hybrid_heavy";
-		case "Bewaffnung [Installation]":
-			return "weapon_installation";
-		case "Spezialisierung Depot":
-			return "depot_upgrade";
-		case "Bewaffnung [Station]":
-			return "weapon_depot";
-		case "Rüstslot schwerer Kreuzer":
-			return "heavy_cruiser_upgrade";
-		case "Bewaffnung [große Schiffe]":
-			return "weapon_large";
-		case "Rüstslot Flottentender":
-			return "flottender_upgrade";
-		case "Rüstslot Großfrachter":
-			return "transport_upgrade";
-		case "Spezialisierung Boadicea":
-			return "boadicea_upgrade"; 
-		case "Spezialisierung Nareos-Installation":
-			return "nareos_upgrade";
-		case "Rüstslot Fregatte":
-			return "fregatte_upgrade";
-		case "Paladin Defensivwaffen":
-			return "paladin_terran_destroyer_deffensive";
-		case "Paladin Antrieb":
-			return "paladin_terran_destroyer_engine";
-		case "Paladin Hülle":
-			return "paladin_terran_destroyer_hull";
-		case "Paladin Offensivwaffen":
-			return "paladin_terran_destroyer_offensive";
-		case "Paladin Reaktor":
-			return "paladin_terran_destroyer_reactor";
-		case "Paladin Spezial":
-			return "paladin_terran_destroyer_special";
-		case "Paladin Technik":
-			return "paladin_terran_destroyer_tech";
-		case "Pharos Deffensivwaffen":
-			return "pharos_vasudan_destroyer_deffensive";
-		case "Pharos Antrieb":
-			return "pharos_vasudan_destroyer_engine";
-		case "Pharos Hülle":
-			return "pharos_vasudan_destroyer_hull";
-		case "Pharos Offensivwaffen":
-			return "pharos_vasudan_destroyer_offensive";
-		case "Pharos Reaktor":
-			return "pharos_vasudan_destroyer_reactor";
-		case "Pharos Spezial":
-			return "pharos_vasudan_destroyer_special";
-		case "Pharos Technik":
-			return "pharos_vasudan_destroyer_tech";
-		case "Einheitenquartiere [PTr]":
-			return "troop_upgrade";
-		// guessed end
-		case "Rüstslot Kaperschiff":
-			return "boarding_cruiser_upgrade";
-		case "Zerstörer Deffensivwaffen":
-			return "destroyer_deffensive";
-		case "Zerstörer Antrieb":
-			return "destroyer_engine";
-		case "Zerstörer Hülle":
-			return "destroyer_hull";
-		case "Zerstörer Offensivwaffen":
-			return "destroyer_offensive";
-		case "Zerstörer Reaktor":
-			return "destroyer_reactor";
-		case "Zerstörer Spezial":
-			return "destroyer_special";
-		case "Zerstörer Technik":
-			return "destroyer_tech";
-		case "Drohnen Kontrollslot":
-			return "drone_cont";
-		case "Hatshepsut Deffensivwaffen":
-			return "hatshepsut_vasudan_destroyer_deffensive";
-		case "Hatshepsut Antrieb":
-			return "hatshepsut_vasudan_destroyer_engine";
-		case "Hatshepsut Hülle":
-			return "hatshepsut_vasudan_destroyer_hull";
-		case "Hatshepsut Offensivwaffen":
-			return "hatshepsut_vasudan_destroyer_offensive";
-		case "Hatshepsut Reaktor":
-			return "hatshepsut_vasudan_destroyer_reactor";
-		case "Hatshepsut Spezial":
-			return "hatshepsut_vasudan_destroyer_special";
-		case "Hatshepsut Technik":
-			return "hatshepsut_vasudan_destroyer_tech";
-		case "Hecate Deffensivwaffen":
-			return "hecate_terran_destroyer_deffensive";
-		case "Hecate Antrieb":
-			return "hecate_terran_destroyer_engine";
-		case "Hecate Hülle":
-			return "hecate_terran_destroyer_hull";
-		case "Hecate Offensivwaffen":
-			return "hecate_terran_destroyer_offensive";
-		case "Hecate Reaktor":
-			return "hecate_terran_destroyer_reactor";
-		case "Hecate Spezial":
-			return "hecate_terran_destroyer_special";
-		case "Hecate Technik":
-			return "hecate_terran_destroyer_tech";
-		case "Primärwaffe [Jäger]":
-			return "jprimary";
-		case "Sekundärwaffe [Jäger]":
-			return "jsecondary";
-		case "Diverses":
-			return "misc";
-		case "Scanner":
-			return "miscawacs";
-		case "Diverses [Tanker]":
-			return "misctanker";
-		case "Rüstslot Ganymed-Station":
-			return "misc_ganystation";
-		case "Rüstset [Träger]": // renamed Diverses [Kottos] to Rüstset [Träger]
-			return "misc_kottos";
-		case "Diverses [große Schiffe]": // changed ss to ß
-			return "misc_large";
-		// TODO: can't be distinguished?
-		// case "Bewaffnung": return "misc_large_weapon";
-		case "Diverses [Scanner]":
-			return "misc_scanner";
-		case "Werftpack":
-			return "misc_shipyard";
-		case "Rüststlot Station":
-			return "misc_station";
-		case "Bewaffnung":
-			return "misc_weapon";
-		case "Orion Deffensivwaffen":
-			return "orion_terran_destroyer_deffensive";
-		case "Orion Antrieb":
-			return "orion_terran_destroyer_engine";
-		case "Orion Hülle":
-			return "orion_terran_destroyer_hull";
-		case "Orion Offensivwaffen":
-			return "orion_terran_destroyer_offensive";
-		case "Orion Reaktor":
-			return "orion_terran_destroyer_reactor";
-		case "Orion Spezial":
-			return "orion_terran_destroyer_special";
-		case "Orion Technik":
-			return "orion_terran_destroyer_tech";
-		case "Rüstslot Paladin":
-			return "paladin_misc";
-		case "Shivanische Zerstörer Deffensivwaffen":
-			return "shivan_destroyer_deffensive";
-		case "Shivanische Zerstörer Antrieb":
-			return "shivan_destroyer_engine";
-		case "Shivanische Zerstörer Hülle":
-			return "shivan_destroyer_hull";
-		case "Shivanische Zerstörer Offensivwaffen":
-			return "shivan_destroyer_offensive";
-		case "Shivanische Zerstörer Reaktor":
-			return "shivan_destroyer_reactor";
-		case "Shivanische Zerstörer Spezial":
-			return "shivan_destroyer_special";
-		case "Shivanische Zerstörer Technik":
-			return "shivan_destroyer_tech";
-		case "Rüstslot Kreuzer z.b.V.":
-			return "spec_cruiser_upgrade";
-		case "Rüstslot terranische Korvette":
-			return "terran_corvette_upgrade";
-		case "Rüstslot terranischer Kreuzer":
-			return "terran_cruiser_upgrade";
-		case "Terranische Zerstörer Deffensivwaffen":
-			return "terran_destroyer_deffensive";
-		case "Terranische Zerstörer Antrieb":
-			return "terran_destroyer_engine";
-		case "Terranische Zerstörer Hülle":
-			return "terran_destroyer_hull";
-		case "Terranische Zerstörer Offensivwaffen":
-			return "terran_destroyer_offensive";
-		case "Terranische Zerstörer Reaktor":
-			return "terran_destroyer_reactor";
-		case "Terranische Zerstörer Spezial":
-			return "terran_destroyer_special";
-		case "Terranische Zerstörer Technik":
-			return "terran_destroyer_tech";
-		case "Rüstslot terranischer schwerer Kreuzer":
-			return "terran_hcruiser_upgrade";
-		case "Typhoon Deffensivwaffen":
-			return "typhoon_vasudan_destroyer_deffensive";
-		case "Typhoon Antrieb":
-			return "typhoon_vasudan_destroyer_engine";
-		case "Typhoon Hülle":
-			return "typhoon_vasudan_destroyer_hull";
-		case "Typhoon Offensivwaffen":
-			return "typhoon_vasudan_destroyer_offensive";
-		case "Typhoon Reaktor":
-			return "typhoon_vasudan_destroyer_reactor";
-		case "Typhoon Spezial":
-			return "typhoon_vasudan_destroyer_special";
-		case "Typhoon Technik":
-			return "typhoon_vasudan_destroyer_tech";
-		case "Rüstslot vasudanische Korvette":
-			return "vasudan_corvette_upgrade";
-		case "Rüstslot vasudanischer Kreuzer":
-			return "vasudan_cruiser_upgrade";
-		case "Vasudanische Zerstörer Deffensivwaffen":
-			return "vasudan_destroyer_deffensive";
-		case "Vasudanische Zerstörer Antrieb":
-			return "vasudan_destroyer_engine";
-		case "Vasudanische Zerstörer Hülle":
-			return "vasudan_destroyer_hull";
-		case "Vasudanische Zerstörer Offensivwaffen":
-			return "vasudan_destroyer_offensive";
-		case "Vasudanische Zerstörer Reaktor":
-			return "vasudan_destroyer_reactor";
-		case "Vasudanische Zerstörer Spezial":
-			return "vasudan_destroyer_special";
-		case "Vasudanische Zerstörer Technik":
-			return "vasudan_destroyer_tech";
-		case "Rüstslot vasudanischer schwerer Kreuzer":
-			return "vasudan_hcruiser_upgrade";
-		case "Bewaffnung Ganymed-Station":
-			return "weapon_ganystation";
-		case "Bewaffnung Station":
-			return "weapon_station";
-		default:
-			unknownLine("getModule " + desc);
-			return "UNKNOWN_" + desc;
-		}
+	private String getModuleId(String desc) {
+		return normalizeString(desc);
 	}
-	
+
+	/**
+	 * Get internal weapon string by its name.
+	 * Uses the normalized name as id.
+	 * 
+	 * @param name name of the weapon.
+	 * @return id string of the weapon.
+	 */
+	private String getWeaponId(String name) {
+		return normalizeString(name);
+	}
+
 	private ShipType lastShipType; 
 	public ShipType getShipType(){
 		return this.lastShipType;
@@ -381,7 +161,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		ShipType shipType = new ShipTypeExt(shipId);
 		ShipBaubar shipBaubar = new ShipBaubarExt(shipType);
 
-		String weaponName = "";
+		String weaponId = "";
 		StringBuilder shipFlags = new StringBuilder();
 		String section = "";
 		String line;
@@ -456,10 +236,10 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 			} else if (line.equals("<h3>Bewaffnung</h3>")) {
 				section = "waffen";
 			} else if (section.equals("waffen") && line.length() > 1 && !line.startsWith("<")) {
-				weaponName = line;
+				weaponId = getWeaponId(line);
 			} else if (section.equals("waffen") && line.startsWith("<span style=")) {
 				// TODO: save all known weapons somewhere
-				Weapon weapon = new Weapon(weaponName); 
+				Weapon weapon = new Weapon(weaponId); 
 				String sub = subString(line, "'\">", null);
 				if (sub.startsWith("AP-Kosten:")) {
 					weapon.setApCost(toInt(subString(sub, "AP-Kosten:", "<br>")));
@@ -516,7 +296,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				}
 			} else if (section.equals("waffen") && line.startsWith("<td class=\"noBorderX\">")) {
 				Map<String, Integer> weapons = shipType.getWeapons();
-				weapons.put(weaponName, toInt(subString(line, "<td class=\"noBorderX\">", "</td>")));
+				weapons.put(weaponId, toInt(subString(line, "<td class=\"noBorderX\">", "</td>")));
 				shipType.setWeapons(weapons);
 			} else if (section.equals("waffen") && (line.equals("</tbody></table>") || line.equals("<tbody><tr><td class=\"noBorderX\">-keine-</td></tr>"))) {
 				section = "";
@@ -548,7 +328,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 				StringBuilder modules = new StringBuilder();
 				while (sub.contains("<br>")) {
 					modules.append(counter).append(":");
-					modules.append(getModule(subString(sub, null, "<br>"))).append(";");
+					modules.append(getModuleId(subString(sub, null, "<br>"))).append(";");
 					sub = subString(sub, "<br>", null);
 					counter++;
 				}
@@ -608,7 +388,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		this.lastShipType = shipType;
 		this.lastShipBaubar = shipBaubar;
 	}	
-	
+
 	/**
 	 * Guess values that aren't part of the SchiffInfo page.
 	 * 
@@ -631,7 +411,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 		// TODO: Einwegwerft?
 		return shipType;
 	}
-	
+
 	/**
 	 * Process unknown lines. Ignore expected unused lines, and output
 	 * unexpected lines.
@@ -677,6 +457,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 	 * @param ship the ShipType to print.
 	 * @return String representation of ship.
 	 */
+	@Deprecated
 	public String toString(ShipType ship) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Id: ").append(ship.getId()).append(" | ");
@@ -733,6 +514,7 @@ public class SchiffInfoProcessor extends DSPageProcessor {
 	 * @param ship the ShipBaubar to print.
 	 * @return String representation of ship.
 	 */
+	@Deprecated
 	public String toString(ShipBaubar ship) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Id: ").append(ship.getId()).append(" | ");

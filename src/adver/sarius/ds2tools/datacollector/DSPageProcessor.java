@@ -35,7 +35,7 @@ public abstract class DSPageProcessor {
 		}
 		return line.substring(0, end);
 	}
-	
+
 	/**
 	 * Converts a string into an integer.
 	 * Removes all '.' characters as they are used as thousands separator.
@@ -46,7 +46,7 @@ public abstract class DSPageProcessor {
 	public int toInt(String number) {
 		return Integer.parseInt(number.trim().replaceAll("\\.", ""));
 	}
-	
+
 	/**
 	 * Converts some html tags into DS2 format to be stored in the DB.
 	 * 
@@ -88,5 +88,19 @@ public abstract class DSPageProcessor {
 			}
 		}
 		return html;
+	}
+
+	/**
+	 * Turns everything into lower case and replaces or removes special characters.
+	 * 
+	 * @param name String to normalize.
+	 * @return normalized String.
+	 */
+	public String normalizeString(String name) {
+		name = name.toLowerCase();
+		name = name.replace("[", "").replace("]", "").replace(".", "").replaceAll(":", "");
+		name = name.replace("_", " ").replace("-", " ").replaceAll(" +", "_");
+		name = name.replace("ß", "ss").replace("ä", "ae").replace("ö", "oe").replace("ü", "ue");
+		return name;
 	}
 }
