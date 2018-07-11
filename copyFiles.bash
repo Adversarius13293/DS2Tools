@@ -1,5 +1,6 @@
+#!/bin/bash
 MDIR=src/net/driftingsouls/ds2/server
-CDIR=../ds2j-opensource/$MDIR
+CDIR=../driftingsouls/$MDIR
 
 mkdir -p $MDIR/entities/ && cp -n $CDIR/entities/JumpNode.java "$_"
 mkdir -p $MDIR/entities/ && cp -n $CDIR/entities/Weapon.java "$_"
